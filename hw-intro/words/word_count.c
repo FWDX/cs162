@@ -37,7 +37,16 @@ int init_words(WordCount **wclist) {
      Returns 0 if no errors are encountered
      in the body of this function; 1 otherwise.
   */
-  *wclist = NULL;
+  if (wclist == NULL) {
+    return 1;
+  }
+  *wclist = (WordCount*)malloc(sizeof(WordCount));
+  if (*wclist == NULL) {
+    return 1;
+  }
+  (*wclist)->next = NULL;
+  (*wclist)->count = 0;
+  (*wclist)->word = "123";
   return 0;
 }
 
@@ -46,13 +55,24 @@ ssize_t len_words(WordCount *wchead) {
      encountered in the body of
      this function.
   */
-    size_t len = 0;
-    return len;
+  size_t len = 1;
+  if (wchead->count == 0) return 0;
+  while (wchead->next != NULL) {
+    len++;
+    wchead = wchead->next;
+  }
+  return len;
 }
 
 WordCount *find_word(WordCount *wchead, char *word) {
   /* Return count for word, if it exists */
   WordCount *wc = NULL;
+  while ((strcmp(wchead->word, word) != 0) && wchead->next != NULL) {
+    wchead = wchead->next;
+  }
+  if (strcmp(wchead->word, word) == 0) {
+    wc = wchead;
+  }
   return wc;
 }
 
@@ -61,7 +81,34 @@ int add_word(WordCount **wclist, char *word) {
      Otherwise insert with count 1.
      Returns 0 if no errors are encountered in the body of this function; 1 otherwise.
   */
- return 0;
+  if (wclist == NULL || word == NULL) {
+    return 1;
+  }
+  WordCount *wchead = *wclist;
+  if (wchead->count == 0) {
+    wchead->count = 1;
+    wchead->word = (char*)malloc((strlen(word)+1)*sizeof(char));
+    strcpy(wchead->word, word);
+  } else {
+    WordCount *wc = find_word(wchead, word);
+    if (wc != NULL) {
+      wc->count++;
+    } else {
+      while (wchead->next != NULL) {
+        wchead = wchead->next;
+      }
+      wchead->next = (WordCount*)malloc(sizeof(WordCount));
+      if (wchead->next == NULL) {
+        return 1;
+      }
+      wchead->next->next = NULL;
+      wchead->next->count = 1;
+      wchead->next->word = (char*)malloc((strlen(word)+1)*sizeof(char));
+      
+      strcpy(wchead->next->word, word);
+    }
+  }
+  return 0;
 }
 
 void fprint_words(WordCount *wchead, FILE *ofile) {
