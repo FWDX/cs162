@@ -40,13 +40,7 @@ int init_words(WordCount **wclist) {
   if (wclist == NULL) {
     return 1;
   }
-  *wclist = (WordCount*)malloc(sizeof(WordCount));
-  if (*wclist == NULL) {
-    return 1;
-  }
-  (*wclist)->next = NULL;
-  (*wclist)->count = 0;
-  (*wclist)->word = "123";
+  *wclist = NULL;
   return 0;
 }
 
@@ -67,6 +61,9 @@ ssize_t len_words(WordCount *wchead) {
 WordCount *find_word(WordCount *wchead, char *word) {
   /* Return count for word, if it exists */
   WordCount *wc = NULL;
+  if (wchead == NULL) {
+    return wc;
+  }
   while ((strcmp(wchead->word, word) != 0) && wchead->next != NULL) {
     wchead = wchead->next;
   }
@@ -85,10 +82,15 @@ int add_word(WordCount **wclist, char *word) {
     return 1;
   }
   WordCount *wchead = *wclist;
-  if (wchead->count == 0) {
-    wchead->count = 1;
-    wchead->word = (char*)malloc((strlen(word)+1)*sizeof(char));
-    strcpy(wchead->word, word);
+  if (*wclist == NULL) {
+    *wclist = (WordCount*)malloc(sizeof(WordCount));
+    if (*wclist == NULL) {
+      return 1;
+    }
+    (*wclist)->next = NULL;
+    (*wclist)->count = 1;
+    (*wclist)->word = (char*)malloc((strlen(word)+1)*sizeof(char));
+    strcpy((*wclist)->word, word);
   } else {
     WordCount *wc = find_word(wchead, word);
     if (wc != NULL) {

@@ -117,7 +117,7 @@ static bool wordcount_less(const WordCount *wc1, const WordCount *wc2) {
     return 1;
   }
   return 0;
-}
+} 
 
 // In trying times, displays a helpful message.
 static int display_help(void) {
